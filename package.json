@@ -1,0 +1,29 @@
+{
+  "name": "wa-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js"
+  },
+  "keywords": [],
+  "type": "module",
+  "dependencies": {
+    "@whiskeysockets/baileys": "7.0.0-rc14",
+    "dotenv": "18.0.9",
+    "node-webpmux": "^3.2.1",
+    "pino": "10.4.0",
+    "qrcode": "^1.5.4",
+    "qrcode-terminal": "0.12.0",
+    "sharp": "^0.35.5",
+    "wa-sticker-formatter": "^4.4.4"
+  },
+  "devDependencies": {
+    "eslint": "^10.13.0"
+  },
+  "allowScripts": {
+    "sharp@0.35.5": true,
+    "sharp@0.30.7": true
+  }
+}
