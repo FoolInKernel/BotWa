@@ -1,38 +1,14 @@
-import 'dotenv/config'
 import makeWASocket, {
   DisconnectReason,
   useMultiFileAuthState,
 } from '@whiskeysockets/baileys'
 import pino from 'pino'
 import qrcode from 'qrcode-terminal'
-import { handleMenu } from './messages/menu.js'
-import { isAllowedGroup, manageGroups } from './groups.js'
-import { handleSticker } from './messages/stickers.js'
+import { AUTH_DIR, LOG_LEVEL } from './config.js'
+import { loadCommands } from './core/command-loader.js'
+import { createMessageHandler } from './core/message-handler.js'
 
-const logger = pino({ level: process.env.LOG_LEVEL || 'warn' })
-const AUTH_DIR = process.env.AUTH_DIR || './data/auth'
-const PREFIX = '.'
-
-const OWNER_NUMBER = (process.env.OWNER_NUMBER || '').replace(/\D/g, '')
-
-function isOwnerMessage(msg) {
-  if (!OWNER_NUMBER) return false
-  const candidates = [
-    msg.key.remoteJidAlt,
-    msg.key.participantAlt,
-    msg.key.participant,
-    msg.key.remoteJid,
-  ]
-
-  return candidates.some((jid) => {
-    if (!jid || !jid.endsWith('@s.whatsapp.net')) {
-      return false
-    }
-
-    const number = jid.split('@')[0].replace(/\D/g, '')
-    return number === OWNER_NUMBER
-  })
-}
+const logger = pino({ level: LOG_LEVEL })
 
 let stopping = false
 let retryDelay = 2000
@@ -45,6 +21,9 @@ const STARTUP_TIMEOUT_MS = 60_000
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 async function startBot() {
+  const commands = await loadCommands()
+  const handleMessage = createMessageHandler(commands)
+
   while (!stopping) {
     try {
       const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR)
@@ -95,50 +74,8 @@ async function startBot() {
         if (type !== 'notify') return
 
         for (const msg of messages) {
-          if (!msg.message || msg.key.fromMe) continue
-
-          const jid = msg.key.remoteJid
-
-          if (!jid || jid === 'status@broadcast') continue
-
-          const isGroup = jid.endsWith('@g.us')
-
-          const text =
-            msg.message.conversation ||
-            msg.message.extendedTextMessage?.text ||
-            msg.message.imageMessage?.caption ||
-            msg.message.videoMessage?.caption ||
-            ''
-
-          const input = text.trim()
-          if (!input.startsWith(PREFIX)) continue
-
-          const [command, ...args] = input
-            .slice(PREFIX.length)
-            .trim()
-            .toLowerCase()
-            .split(/\s+/)
-
           try {
-            const owner = isOwnerMessage(msg)
-
-            const managed = await manageGroups(sock, msg, command, args, owner)
-
-            if (managed) continue
-
-            if (isGroup && !(await isAllowedGroup(jid))) continue
-
-            const handled = await handleSticker(sock, msg, command)
-            if (handled) continue
-
-            if (command === 'ping') {
-              await sock.sendMessage(jid, {
-                text: 'Pong! Bot aktif. ✅',
-              })
-              continue
-            }
-
-            await handleMenu(sock, jid, command)
+            await handleMessage(sock, msg)
           } catch (error) {
             console.error('Gagal memproses pesan:', error.message)
           }
