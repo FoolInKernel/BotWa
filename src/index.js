@@ -37,6 +37,10 @@ function isOwnerMessage(msg) {
 let stopping = false
 let retryDelay = 2000
 let activeSocket
+let connectedOnce = false
+let startupTimer
+
+const STARTUP_TIMEOUT_MS = 60_000
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -44,6 +48,8 @@ async function startBot() {
   while (!stopping) {
     try {
       const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR)
+
+      if (stopping) break
 
       const sock = makeWASocket({
         auth: state,
@@ -65,6 +71,8 @@ async function startBot() {
         }
 
         if (connection === 'open') {
+          connectedOnce = true
+          clearTimeout(startupTimer)
           retryDelay = 2000
           console.log('Bot WhatsApp terhubung.')
         }
@@ -161,12 +169,24 @@ async function startBot() {
 async function shutdown(signal) {
   if (stopping) return
   console.log(`\nMenerima ${signal}; menghentikan bot...`)
+  clearTimeout(startupTimer)
   stopping = true
   activeSocket?.end(undefined)
 }
 
 process.once('SIGINT', () => void shutdown('SIGINT'))
 process.once('SIGTERM', () => void shutdown('SIGTERM'))
+
+startupTimer = setTimeout(() => {
+  if (connectedOnce || stopping) return
+
+  console.error(
+    'Gagal terhubung ke WhatsApp dalam 60 detik; menghentikan bot.',
+  )
+  stopping = true
+  activeSocket?.end(undefined)
+  process.exitCode = 1
+}, STARTUP_TIMEOUT_MS)
 
 startBot().catch((error) => {
   console.error(error)
