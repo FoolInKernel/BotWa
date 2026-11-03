@@ -4,3 +4,4 @@ data/
 auth_info_baileys/
 *.log
 .clinerules
+.AGENTS.md
