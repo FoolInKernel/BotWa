@@ -59,8 +59,6 @@ wa-bot/
 | `.menu` | `.help` | umum | Daftar perintah bot |
 | `.s` | `.sticker` | umum | Buat stiker dari foto langsung / reply foto (max 30MB, queue 2 job) |
 | `.hd` | — | umum | Downscale foto langsung / reply foto ke 144p (JPEG q30) |
-| `.brat` | — | umum | Buat stiker teks statis gaya Brat |
-| `.brat2` | — | umum | Buat stiker animasi teks kata demi kata gaya Brat |
 | `.group add\|remove\|list` | — | owner-only, `allowUnlistedGroup` | Kelola whitelist grup |
 | `.sistem` | — | owner-only, `allowUnlistedGroup` | Info CPU, RAM, disk, uptime |
 

@@ -17,8 +17,6 @@ assert.ok(commands.has('help'), 'help alias registered')
 assert.ok(commands.has('s'), 's registered')
 assert.ok(commands.has('sticker'), 'sticker alias registered')
 assert.ok(commands.has('hd'), 'hd registered')
-assert.ok(commands.has('brat'), 'brat registered')
-assert.ok(commands.has('brat2'), 'brat2 registered')
 assert.ok(commands.has('group'), 'group registered')
 
 // Alias mengarah ke command yang sama
