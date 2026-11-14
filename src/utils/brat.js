@@ -1,5 +1,3 @@
-import sharp from 'sharp'
-
 function wrapText(text, maxCharsPerLine = 16) {
   const words = text.toLowerCase().trim().split(/\s+/)
   const lines = []
@@ -29,20 +27,23 @@ function escapeXml(unsafe) {
   })
 }
 
-export function generateBratSvg(text) {
+export function generateBratSvg(text, invert = false) {
   const lines = wrapText(text, 16)
   const fontSize = lines.length > 5 ? 36 : lines.length > 3 ? 42 : 54
   const lineHeight = fontSize * 1.25
   const totalHeight = lines.length * lineHeight
   const startY = Math.max(60, (512 - totalHeight) / 2 + fontSize)
 
+  const bgColor = invert ? '#000000' : '#8ACE00'
+  const textColor = invert ? '#FFFFFF' : '#000000'
+
   const tspanLines = lines
     .map((line, i) => `<tspan x="40" dy="${i === 0 ? 0 : lineHeight}">${escapeXml(line)}</tspan>`)
     .join('')
 
   return `<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-    <rect width="100%" height="100%" fill="#8ACE00"/>
-    <text x="40" y="${startY}" font-family="Arial, sans-serif" font-weight="bold" font-size="${fontSize}" fill="#000000">
+    <rect width="100%" height="100%" fill="${bgColor}"/>
+    <text x="40" y="${startY}" font-family="Arial, sans-serif" font-weight="bold" font-size="${fontSize}" fill="${textColor}">
       ${tspanLines}
     </text>
   </svg>`

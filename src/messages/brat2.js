@@ -19,28 +19,13 @@ export default {
     }
 
     try {
-      const words = text.split(/\s+/)
-      const frameBuffers = []
-
-      for (let i = 1; i <= words.length; i++) {
-        const partialText = words.slice(0, i).join(' ')
-        const svg = generateBratSvg(partialText)
-        const frameBuf = await sharp(Buffer.from(svg))
-          .resize(512, 512)
-          .png()
-          .toBuffer()
-        frameBuffers.push(frameBuf)
-      }
-
-      if (words.length > 1) {
-        frameBuffers.push(frameBuffers[frameBuffers.length - 1])
-      }
-
-      const animatedWebp = await sharp(frameBuffers, { animated: true })
-        .webp({ delay: 500, loop: 0 })
+      const svg = generateBratSvg(text, true)
+      const pngBuf = await sharp(Buffer.from(svg))
+        .resize(512, 512)
+        .png()
         .toBuffer()
 
-      const sticker = new Sticker(animatedWebp, {
+      const sticker = new Sticker(pngBuf, {
         pack: 'bot',
         author: 'napoleon',
         type: 'full',
@@ -59,7 +44,7 @@ export default {
       console.error('Gagal membuat brat2:', error)
       await sock.sendMessage(
         jid,
-        { text: 'Gagal membuat stiker animasi brat2.' },
+        { text: 'Gagal membuat stiker brat2.' },
         { quoted: msg },
       )
     }
