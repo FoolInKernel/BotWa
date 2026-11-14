@@ -12,7 +12,7 @@ export default {
         '• .menu — Menampilkan menu',
         '• .s - membuat stiker',
         '• .sticker - membuat stiker',
-        '• .hd — Ubah foto jadi resolusi rendah (144p)',
+        '• .hd — hd foto',
       ].join('\n'),
     })
   },
