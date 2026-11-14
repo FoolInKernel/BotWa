@@ -10,19 +10,19 @@ Target produksi: STB **HG680P** (Armbian ARM64, RAM 2 GB, eMMC) — wajib hemat 
 ```text
 wa-bot/
 ├── src/
-│   ├── index.js                 # Entry point (socket Baileys, reconnect, shutdown)
+│   ├── index.js                 # Entry point (socket Baileys, reconnect, shutdown, error guards)
 │   ├── config.js                # Environment config (.env)
 │   ├── groups.js                # Whitelist grup persistence (data/allowed-groups.json)
 │   ├── core/
 │   │   ├── command-loader.js    # Auto-discovery command di src/messages/*.js
-│   │   └── message-handler.js   # Parsing + Access Control terpusat
+│   │   └── message-handler.js   # Parsing + Access Control terpusat (multi-device JID)
 │   ├── utils/
 │   │   └── media.js             # Helper ekstraksi gambar (langsung / reply)
 │   └── messages/                # Satu file per command (auto-loaded)
 │       ├── ping.js
 │       ├── menu.js
-│       ├── stickers.js
-│       ├── hd.js
+│       ├── stickers.js          # Batas 30MB & queue max 2 concurrent jobs
+│       ├── hd.js                # Downscale 144p (langsung / reply)
 │       ├── group.js
 │       └── sistem.js
 ├── test/test-loader-auth.js     # Test loader & otorisasi tanpa koneksi WA
@@ -36,9 +36,9 @@ wa-bot/
 
 ## Peran Modul & Aturan Pengembangan
 
-1. **`src/index.js`**: Socket Baileys, QR, reconnect backoff, shutdown SIGINT/SIGTERM, timeout 60 detik. DILARANG import/register command manual di sini.
+1. **`src/index.js`**: Socket Baileys dengan `getMessage`, QR, reconnect backoff, shutdown SIGINT/SIGTERM, timeout 60 detik, serta global error handler (`uncaughtException` & `unhandledRejection`) untuk mencegah crash app-state sync. DILARANG import/register command manual di sini.
 2. **`src/core/command-loader.js`**: Auto-load semua file `.js` di `src/messages/` secara deterministik. Validasi nama/alias unik & kontrak modul.
-3. **`src/core/message-handler.js`**: Pusat otorisasi (owner check termasuk multi-device JID, whitelist grup). Command tidak boleh mengimplementasikan check otorisasi sendiri.
+3. **`src/core/message-handler.js`**: Pusat otorisasi (owner check termasuk multi-device JID `jid.split('@')[0].split(':')[0]`, whitelist grup). Command tidak boleh mengimplementasikan check otorisasi sendiri.
 4. **`src/utils/media.js`**: Utility `getImageData` untuk mengekstrak media gambar baik dari pesan langsung maupun reply (quoted message).
 5. **`src/messages/`**: Setiap command adalah 1 file JS tersendiri dengan kontrak:
    ```js
@@ -62,13 +62,16 @@ wa-bot/
 | `.group add\|remove\|list` | — | owner-only, `allowUnlistedGroup` | Kelola whitelist grup |
 | `.sistem` | — | owner-only, `allowUnlistedGroup` | Info CPU, RAM, disk, uptime |
 
-## Manajemen Resource & Keamanan
+## Manajemen Resource & Keamanan (STB HG680P)
 
-- **Resource STB 2GB RAM**: Utamakan pemrosesan media via In-Memory Buffer (`Buffer`), hindari temp file fisik jika tidak perlu. Batasi pekerjaan berat secara konsisten (misal queue limit).
+- **Resource STB 2GB RAM & eMMC terbatas**: 
+  - Utamakan pemrosesan media ringan via In-Memory Buffer (`Buffer`).
+  - **DILARANG** menggunakan library berbasis video/renderer berat (seperti `brat-canvas` atau `ffmpeg` full) karena memerlukan instalasi 151+ dependensi (>393 MB) dan boros CPU/RAM.
+  - Batasi pekerjaan berat secara konsisten (queue max 2 job untuk stiker).
 - **Keamanan**:
   - DILARANG commit `.env`, `data/auth/`, file sesi WA, atau secret ke git.
   - Jangan pernah melembutkan otorisasi owner atau whitelist grup.
-  - Selalu validasi ukuran file input (misal maks 30MB).
+  - Selalu validasi ukuran file input (maks 30MB).
 
 ## Menjalankan & Verifikasi
 
@@ -78,5 +81,3 @@ npm ci --only=production           # Install dependensi di server
 node test/test-loader-auth.js      # Test loader + otorisasi
 node --check <file.js>             # Cek sintaks file yang diubah
 ```
-
-*Catatan STB ARM64*: Jika `sharp` gagal install prebuilt binary, install `build-essential` & `python3` via `apt install build-essential python3`.
