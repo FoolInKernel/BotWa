@@ -10,9 +10,10 @@ export default {
         '📌 Daftar perintah:',
         '• .ping — Cek status bot',
         '• .menu — Menampilkan menu',
-        '• .s - membuat stiker',
-        '• .sticker - membuat stiker',
-        '• .hd — hd foto',
+        '• .s / .sticker — Membuat stiker dari foto',
+        '• .hd — Ubah foto jadi resolusi 144p',
+        '• .brat — Buat stiker teks gaya Brat',
+        '• .brat2 — Buat stiker animasi teks Brat',
       ].join('\n'),
     })
   },

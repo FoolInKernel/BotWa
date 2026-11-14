@@ -10,6 +10,8 @@ Bot WhatsApp ringan berbasis **Node.js ESM** + **Baileys**, dirancang untuk dija
 | `.menu` | `.help` | Umum | Menampilkan daftar perintah bot |
 | `.s` | `.sticker` | Umum | Buat stiker dari foto langsung / reply foto (max 30MB, queue 2 job) |
 | `.hd` | — | Umum | Downscale foto langsung / reply foto ke resolusi 144p |
+| `.brat` | — | Umum | Buat stiker teks statis gaya Brat |
+| `.brat2` | — | Umum | Buat stiker animasi teks kata demi kata gaya Brat |
 | `.group` | — | Owner | Kelola whitelist grup (`add`, `remove`, `list`) |
 | `.sistem` | — | Owner | Informasi CPU, RAM, Disk, dan Uptime server |
 
