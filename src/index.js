@@ -20,6 +20,15 @@ const STARTUP_TIMEOUT_MS = 60_000
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
+// Prevent background sync errors from crashing process
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err?.message || err)
+})
+
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled Rejection:', reason?.message || reason)
+})
+
 async function startBot() {
   const commands = await loadCommands()
   const handleMessage = createMessageHandler(commands)
@@ -36,6 +45,7 @@ async function startBot() {
         printQRInTerminal: false,
         markOnlineOnConnect: false,
         syncFullHistory: false,
+        getMessage: async () => undefined,
       })
 
       activeSocket = sock
