@@ -15,7 +15,7 @@ function isOwnerMessage(msg) {
       return false
     }
 
-    const number = jid.split('@')[0].replace(/\D/g, '')
+    const number = jid.split('@')[0].split(':')[0].replace(/\D/g, '')
     return number === OWNER_NUMBER
   })
 }

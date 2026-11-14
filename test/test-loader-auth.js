@@ -16,6 +16,7 @@ assert.ok(commands.has('menu'), 'menu registered')
 assert.ok(commands.has('help'), 'help alias registered')
 assert.ok(commands.has('s'), 's registered')
 assert.ok(commands.has('sticker'), 'sticker alias registered')
+assert.ok(commands.has('hd'), 'hd registered')
 assert.ok(commands.has('group'), 'group registered')
 
 // Alias mengarah ke command yang sama
@@ -98,9 +99,9 @@ sent.length = 0
 await handler(fakeSock, makeMsg({
   text: '.group list',
   remoteJid: '123@g.us',
-  participant: '6283873411772@s.whatsapp.net',
+  participant: '6283873411772:12@s.whatsapp.net',
 }))
-assert.ok(sent.length > 0, 'group cmd by owner in unlisted group executed')
+assert.ok(sent.length > 0, 'group cmd by owner with multi-device JID executed')
 
 console.log('✅ Authorization: semua skenario akses benar')
 
