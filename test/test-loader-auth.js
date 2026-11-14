@@ -113,4 +113,30 @@ assert.ok(sent[0].content.text.includes('Daftar perintah'), 'menu text correct')
 
 console.log('✅ Alias: .help → menu benar')
 
+// 2j. Media extractor test (direct & quoted image)
+import { getImageData } from '../src/utils/media.js'
+
+const directImgMsg = makeMsg({ imageMessage: { url: 'https://example.com/img.jpg' } })
+const directData = getImageData(directImgMsg)
+assert.ok(directData?.imageMessage, 'direct image detected')
+
+const quotedImgMsg = {
+  key: { remoteJid: '628123@s.whatsapp.net' },
+  message: {
+    extendedTextMessage: {
+      text: '.s',
+      contextInfo: {
+        stanzaId: 'ABC',
+        participant: '628999@s.whatsapp.net',
+        quotedMessage: { imageMessage: { url: 'https://example.com/quoted.jpg' } },
+      },
+    },
+  },
+}
+const quotedData = getImageData(quotedImgMsg)
+assert.ok(quotedData?.imageMessage, 'quoted image detected')
+assert.strictEqual(quotedData.downloadMsg.key.id, 'ABC', 'quoted stanzaId preserved')
+
+console.log('✅ Media Utility: penanganan foto langsung & reply teruji')
+
 console.log('\n🎉 Semua test lulus.')

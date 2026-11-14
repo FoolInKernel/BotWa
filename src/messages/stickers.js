@@ -1,5 +1,6 @@
 import { downloadMediaMessage } from '@whiskeysockets/baileys'
 import { Sticker } from 'wa-sticker-formatter'
+import { getImageData } from '../utils/media.js'
 
 const PACK_NAME = 'bot'
 const AUTHOR_NAME = 'napoleon'
@@ -39,17 +40,18 @@ export default {
   aliases: ['sticker'],
 
   async execute({ sock, msg, jid }) {
-    const imageMessage = msg.message?.imageMessage
+    const imageData = getImageData(msg)
 
-    if (!imageMessage) {
+    if (!imageData) {
       await sock.sendMessage(
         jid,
-        { text: 'Kirim foto dengan caption .s atau .sticker' },
+        { text: 'Kirim atau reply foto dengan .s atau .sticker' },
         { quoted: msg },
       )
       return
     }
 
+    const { imageMessage, downloadMsg } = imageData
     const fileSize = Number(imageMessage.fileLength || 0)
     if (fileSize > MAX_FILE_SIZE) {
       await sock.sendMessage(
@@ -62,7 +64,7 @@ export default {
 
     await enqueueJob(async () => {
       try {
-        const buffer = await downloadMediaMessage(msg, 'buffer', {})
+        const buffer = await downloadMediaMessage(downloadMsg, 'buffer', {})
 
         const sticker = new Sticker(buffer, {
           pack: PACK_NAME,

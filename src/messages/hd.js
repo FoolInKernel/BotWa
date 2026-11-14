@@ -1,5 +1,6 @@
 import { downloadMediaMessage } from '@whiskeysockets/baileys'
 import sharp from 'sharp'
+import { getImageData } from '../utils/media.js'
 
 const MAX_FILE_SIZE = 30 * 1024 * 1024
 
@@ -8,17 +9,18 @@ export default {
   aliases: [],
 
   async execute({ sock, msg, jid }) {
-    const imageMessage = msg.message?.imageMessage
+    const imageData = getImageData(msg)
 
-    if (!imageMessage) {
+    if (!imageData) {
       await sock.sendMessage(
         jid,
-        { text: 'Kirim foto dengan caption .hd' },
+        { text: 'Kirim atau reply foto dengan .hd' },
         { quoted: msg },
       )
       return
     }
 
+    const { imageMessage, downloadMsg } = imageData
     const fileSize = Number(imageMessage.fileLength || 0)
     if (fileSize > MAX_FILE_SIZE) {
       await sock.sendMessage(
@@ -30,7 +32,7 @@ export default {
     }
 
     try {
-      const buffer = await downloadMediaMessage(msg, 'buffer', {})
+      const buffer = await downloadMediaMessage(downloadMsg, 'buffer', {})
 
       const lowResBuffer = await sharp(buffer)
         .resize({ width: 144, withoutEnlargement: true })
