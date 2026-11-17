@@ -11,7 +11,9 @@ export default {
         '• .ping — Cek status bot',
         '• .menu — Menampilkan menu',
         '• .s / .sticker — Membuat stiker dari foto (langsung / reply)',
-        '• .hd — Ubah foto jadi resolusi rendah 144p (langsung / reply)',
+        '• .hd — Ubah foto jadi resolusi rendah 144p (candaan)',
+        '• .rehd / .upscale — HD-kan foto sungguhan via AI (9Router)',
+        '• .ai / .ask <teks/foto> — Tanya jawab atau analisis foto dengan AI',
       ].join('\n'),
     })
   },

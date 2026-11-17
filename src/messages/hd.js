@@ -39,9 +39,16 @@ export default {
         .jpeg({ quality: 30 })
         .toBuffer()
 
+      const senderJid = msg.key.participant || msg.key.remoteJid
+      const senderNumber = senderJid ? senderJid.split('@')[0].split(':')[0] : ''
+
       await sock.sendMessage(
         jid,
-        { image: lowResBuffer, caption: '✨ HD Ultra 4K (144p)' },
+        {
+          image: lowResBuffer,
+          caption: `✨ HD Ultra 4K (144p)\nRequest by: @${senderNumber}`,
+          mentions: senderJid ? [senderJid] : [],
+        },
         { quoted: msg },
       )
     } catch (error) {
