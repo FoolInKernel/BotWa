@@ -1,39 +1,13 @@
 import { downloadMediaMessage } from '@whiskeysockets/baileys'
 import { Sticker } from 'wa-sticker-formatter'
 import { getImageData } from '../utils/media.js'
+import { enqueueStickerJob } from '../utils/sticker-queue.js'
 
 const PACK_NAME = 'bot'
 const AUTHOR_NAME = 'napoleon'
 const MAX_FILE_SIZE = 30 * 1024 * 1024
-const MAX_CONCURRENT = 2
 
-let activeJobs = 0
-const queue = []
-
-// ponytail: simple in-memory queue for STB resource limits; upgrade to p-limit if queue priorities needed.
-function processQueue() {
-  while (activeJobs < MAX_CONCURRENT && queue.length > 0) {
-    const job = queue.shift()
-    activeJobs++
-    job().finally(() => {
-      activeJobs--
-      processQueue()
-    })
-  }
-}
-
-function enqueueJob(task) {
-  return new Promise((resolve, reject) => {
-    queue.push(async () => {
-      try {
-        resolve(await task())
-      } catch (err) {
-        reject(err)
-      }
-    })
-    processQueue()
-  })
-}
+const enqueueJob = enqueueStickerJob
 
 export default {
   name: 's',

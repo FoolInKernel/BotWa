@@ -9,6 +9,7 @@ Bot WhatsApp ringan berbasis **Node.js ESM** + **Baileys**, dirancang untuk dija
 | `.ping` | — | Umum | Cek status keaktifan bot |
 | `.menu` | `.help` | Umum | Menampilkan daftar perintah bot |
 | `.s` | `.sticker` | Umum | Buat stiker dari foto langsung / reply foto (max 30MB, queue 2 job) |
+| `.sa` | `.audiosticker`, `.stickeraudio` | Umum | Buat stiker bersuara dari video / foto + voice note (eksperimental) |
 | `.hd` | — | Umum | Downscale foto langsung / reply foto ke resolusi 144p |
 | `.rehd` | `.upscale`, `.enhance` | Umum | HD-kan foto sungguhan via AI (9Router) |
 | `.group` | — | Owner | Kelola whitelist grup (`add`, `remove`, `list`) |
@@ -16,10 +17,33 @@ Bot WhatsApp ringan berbasis **Node.js ESM** + **Baileys**, dirancang untuk dija
 
 > **Catatan:** Perintah umum di dalam grup hanya dapat digunakan jika grup tersebut sudah didaftarkan ke whitelist via `.group add`.
 
+### Stiker bersuara (`.sa`) — eksperimental
+
+Fitur ini mengikuti format *sound sticker* WhatsApp beta: WebP + trek audio
+Ogg Opus yang ditempel di `StickerMessage.audioMessage` dan dibungkus
+`audioStickerMessage`. Penerima perlu WhatsApp versi beta yang mendukung fitur
+ini untuk bisa memutar suaranya; di versi lain stiker tetap tampil (tanpa audio).
+
+Cara pakai:
+
+1. **Reply video** dengan `.sa` → stiker animasi + suara dari video tersebut.
+2. **Kirim foto dengan caption `.sa`** sambil **reply voice note/audio** →
+   foto jadi stiker, suara diambil dari pesan yang di-reply.
+3. Tambahkan angka untuk durasi audio: `.sa 8` (default 6, maks 10 detik).
+
+Konversi video/audio memakai `ffmpeg` sistem (bukan paket npm baru). Jika
+`ffmpeg` belum ada, fitur video dan audio non-Opus akan menolak dengan pesan
+yang jelas. Voice note Ogg Opus yang pendek dipakai langsung tanpa ffmpeg.
+
+```bash
+sudo apt install -y ffmpeg   # Armbian/Debian
+```
+
 ## Persyaratan Sistem
 
 - Node.js v18+ (ES Modules)
 - npm
+- `ffmpeg` (opsional, untuk `.sa` dari video / audio non-Opus)
 
 ## Cara Instalasinya & Memulai
 

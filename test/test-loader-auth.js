@@ -16,12 +16,15 @@ assert.ok(commands.has('menu'), 'menu registered')
 assert.ok(commands.has('help'), 'help alias registered')
 assert.ok(commands.has('s'), 's registered')
 assert.ok(commands.has('sticker'), 'sticker alias registered')
+assert.ok(commands.has('sa'), 'sa registered')
+assert.ok(commands.has('audiosticker'), 'audiosticker alias registered')
 assert.ok(commands.has('hd'), 'hd registered')
 assert.ok(commands.has('group'), 'group registered')
 
 // Alias mengarah ke command yang sama
 assert.strictEqual(commands.get('help'), commands.get('menu'))
 assert.strictEqual(commands.get('sticker'), commands.get('s'))
+assert.strictEqual(commands.get('audiosticker'), commands.get('sa'))
 
 // Metadata group
 const groupCmd = commands.get('group')
@@ -138,5 +141,71 @@ assert.ok(quotedData?.imageMessage, 'quoted image detected')
 assert.strictEqual(quotedData.downloadMsg.key.id, 'ABC', 'quoted stanzaId preserved')
 
 console.log('✅ Media Utility: penanganan foto langsung & reply teruji')
+
+// ── 3. Sumber media untuk stiker bersuara (.sa) ─────────────
+import { getSoundSources } from '../src/utils/media.js'
+
+const videoMsg = {
+  key: { remoteJid: '628123@s.whatsapp.net' },
+  message: { videoMessage: { url: 'https://example.com/v.mp4', seconds: 5 } },
+}
+const videoSources = getSoundSources(videoMsg)
+assert.strictEqual(videoSources.visual.kind, 'video', 'visual video terdeteksi')
+assert.strictEqual(videoSources.audio.kind, 'video', 'audio dari video terdeteksi')
+assert.strictEqual(videoSources.visual, videoSources.audio, 'visual & audio satu sumber')
+
+const imageWithQuotedAudio = {
+  key: { remoteJid: '628123@s.whatsapp.net' },
+  message: {
+    imageMessage: {
+      caption: '.sa',
+      contextInfo: {
+        stanzaId: 'AUD1',
+        participant: '628999@s.whatsapp.net',
+        quotedMessage: {
+          audioMessage: { url: 'https://example.com/a.ogg', mimetype: 'audio/ogg; codecs=opus' },
+        },
+      },
+    },
+  },
+}
+const mixedSources = getSoundSources(imageWithQuotedAudio)
+assert.strictEqual(mixedSources.visual.kind, 'image', 'visual foto dari pesan sekarang')
+assert.strictEqual(mixedSources.audio.kind, 'audio', 'audio dari voice note yang di-reply')
+assert.strictEqual(mixedSources.audio.downloadMsg.key.id, 'AUD1', 'stanzaId audio dipertahankan')
+
+const textReplyToVideo = {
+  key: { remoteJid: '628123@s.whatsapp.net' },
+  message: {
+    extendedTextMessage: {
+      text: '.sa',
+      contextInfo: {
+        stanzaId: 'VID1',
+        participant: '628999@s.whatsapp.net',
+        quotedMessage: { videoMessage: { url: 'https://example.com/q.mp4' } },
+      },
+    },
+  },
+}
+const replySources = getSoundSources(textReplyToVideo)
+assert.strictEqual(replySources.visual.kind, 'video', 'visual video dari reply')
+assert.strictEqual(replySources.audio, replySources.visual, 'audio memakai video yang sama')
+
+const textReplyToImage = {
+  key: { remoteJid: '628123@s.whatsapp.net' },
+  message: {
+    extendedTextMessage: {
+      text: '.sa',
+      contextInfo: {
+        stanzaId: 'IMG1',
+        participant: '628999@s.whatsapp.net',
+        quotedMessage: { imageMessage: { url: 'https://example.com/q.jpg' } },
+      },
+    },
+  },
+}
+assert.strictEqual(getSoundSources(textReplyToImage).audio, null, 'foto tanpa audio ditolak')
+
+console.log('✅ .sa: deteksi sumber visual + audio teruji')
 
 console.log('\n🎉 Semua test lulus.')
