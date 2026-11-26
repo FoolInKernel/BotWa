@@ -1,5 +1,5 @@
 import { downloadMediaMessage } from '@whiskeysockets/baileys'
-import { Exif, Sticker } from 'wa-sticker-formatter'
+import waStickerFormatter from 'wa-sticker-formatter'
 import { getSoundSources } from '../utils/media.js'
 import {
   isFfmpegAvailable,
@@ -9,6 +9,10 @@ import {
 } from '../utils/ffmpeg.js'
 import { sendSoundSticker } from '../utils/sound-sticker.js'
 import { enqueueStickerJob } from '../utils/sticker-queue.js'
+
+// wa-sticker-formatter adalah CommonJS; named import Exif gagal di Node lama,
+// jadi ambil lewat default export.
+const { Exif, Sticker } = waStickerFormatter
 
 const PACK_NAME = 'bot'
 const AUTHOR_NAME = 'napoleon'

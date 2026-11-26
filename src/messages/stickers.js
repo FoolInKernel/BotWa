@@ -1,7 +1,10 @@
 import { downloadMediaMessage } from '@whiskeysockets/baileys'
-import { Sticker } from 'wa-sticker-formatter'
+import waStickerFormatter from 'wa-sticker-formatter'
 import { getImageData } from '../utils/media.js'
 import { enqueueStickerJob } from '../utils/sticker-queue.js'
+
+// wa-sticker-formatter adalah CommonJS; named import bisa gagal di Node lama.
+const { Sticker } = waStickerFormatter
 
 const PACK_NAME = 'bot'
 const AUTHOR_NAME = 'napoleon'

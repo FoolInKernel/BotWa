@@ -213,8 +213,10 @@ assert.strictEqual(getSoundSources(textReplyToImage).audio, null, 'foto tanpa au
 console.log('✅ .sa: deteksi sumber visual + audio teruji')
 
 // ── 4. Metadata stiker .sa teruji ──────────────────────────
-import { Exif, extractMetadata, Sticker } from 'wa-sticker-formatter'
+import waStickerFormatter from 'wa-sticker-formatter'
 import sharp from 'sharp'
+
+const { Exif, extractMetadata } = waStickerFormatter
 
 const dummyWebp = await sharp({
   create: { width: 32, height: 32, channels: 4, background: { r: 255, g: 0, b: 0, alpha: 1 } },
