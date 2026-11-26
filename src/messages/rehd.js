@@ -5,25 +5,16 @@ import { isAiEnabled, upscaleImageWithAI } from '../utils/ai.js'
 const MAX_FILE_SIZE = 30 * 1024 * 1024
 
 export default {
-  name: 'rehd',
-  aliases: ['upscale', 'enhance'],
+  name: 'remini',
+  aliases: ['rehd', 'upscale', 'enhance', 'hdr'],
 
   async execute({ sock, msg, jid }) {
-    if (!isAiEnabled()) {
-      await sock.sendMessage(
-        jid,
-        { text: 'Fitur AI belum dikonfigurasi pada server bot.' },
-        { quoted: msg },
-      )
-      return
-    }
-
     const imageData = getImageData(msg)
 
     if (!imageData) {
       await sock.sendMessage(
         jid,
-        { text: 'Kirim atau reply foto dengan .rehd' },
+        { text: 'Kirim atau reply foto dengan .remini' },
         { quoted: msg },
       )
       return
@@ -43,7 +34,7 @@ export default {
     try {
       await sock.sendMessage(
         jid,
-        { text: '⏳ Sedang memproses peningkatan kualitas foto via AI...' },
+        { text: '⏳ Sedang memproses peningkatan kualitas foto via Remini AI...' },
         { quoted: msg },
       )
 
@@ -57,13 +48,13 @@ export default {
         jid,
         {
           image: aiBuffer,
-          caption: `✨ Foto berhasil di-HD-kan oleh AI (9Router)\nRequest by: @${senderNumber}`,
+          caption: `✨ Foto berhasil di-HD-kan oleh Remini AI\nRequest by: @${senderNumber}`,
           mentions: senderJid ? [senderJid] : [],
         },
         { quoted: msg },
       )
     } catch (error) {
-      console.error('Gagal memproses AI HD:', error?.message || error)
+      console.error('Gagal memproses Remini AI:', error?.message || error)
 
       await sock.sendMessage(
         jid,
