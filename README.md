@@ -11,7 +11,7 @@ Bot WhatsApp ringan berbasis **Node.js ESM** + **Baileys**, dirancang untuk dija
 | `.s` | `.sticker` | Umum | Buat stiker dari foto langsung / reply foto (max 30MB, queue 2 job) |
 | `.sa` | `.audiosticker`, `.stickeraudio` | Umum | Buat stiker bersuara dari video / foto + voice note (eksperimental) |
 | `.hd` | — | Umum | Downscale foto langsung / reply foto ke resolusi 144p |
-| `.rehd` | `.upscale`, `.enhance` | Umum | HD-kan foto sungguhan via AI (9Router) |
+| `.remini` | `.upscale`, `.rehd`, `.enhance`, `.hdr` | Umum | Remini AI: naikkan resolusi & detail foto via AI |
 | `.group` | — | Owner | Kelola whitelist grup (`add`, `remove`, `list`) |
 | `.sistem` | — | Owner | Informasi CPU, RAM, Disk, dan Uptime server |
 

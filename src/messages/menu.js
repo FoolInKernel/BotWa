@@ -13,7 +13,7 @@ export default {
         '• .s / .sticker — Membuat stiker dari foto (langsung / reply)',
         '• .sa — Stiker bersuara: reply video/audio atau foto + voice note',
         '• .hd — Ubah foto jadi resolusi rendah 144p (candaan)',
-        '• .rehd / .upscale — HD-kan foto sungguhan via AI (9Router)',
+        '• .remini / .upscale / .rehd — Remini AI tingkatkan resolusi & detail foto',
         '• .ai / .ask <teks/foto> — Tanya jawab atau analisis foto dengan AI',
       ].join('\n'),
     })

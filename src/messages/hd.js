@@ -32,6 +32,12 @@ export default {
     }
 
     try {
+      await sock.sendMessage(
+        jid,
+        { text: '⏳ Sedang memproses foto HD (144p), mohon tunggu...' },
+        { quoted: msg },
+      )
+
       const buffer = await downloadMediaMessage(downloadMsg, 'buffer', {})
 
       const lowResBuffer = await sharp(buffer)
