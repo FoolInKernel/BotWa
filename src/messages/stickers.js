@@ -36,6 +36,12 @@ export default {
       return
     }
 
+    await sock.sendMessage(
+      jid,
+      { text: '⏳ Sedang membuat stiker, mohon tunggu...' },
+      { quoted: msg },
+    )
+
     await enqueueJob(async () => {
       try {
         const buffer = await downloadMediaMessage(downloadMsg, 'buffer', {})

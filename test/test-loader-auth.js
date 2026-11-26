@@ -19,12 +19,16 @@ assert.ok(commands.has('sticker'), 'sticker alias registered')
 assert.ok(commands.has('sa'), 'sa registered')
 assert.ok(commands.has('audiosticker'), 'audiosticker alias registered')
 assert.ok(commands.has('hd'), 'hd registered')
+assert.ok(commands.has('remini'), 'remini registered')
+assert.ok(commands.has('upscale'), 'upscale alias registered')
 assert.ok(commands.has('group'), 'group registered')
 
 // Alias mengarah ke command yang sama
 assert.strictEqual(commands.get('help'), commands.get('menu'))
 assert.strictEqual(commands.get('sticker'), commands.get('s'))
 assert.strictEqual(commands.get('audiosticker'), commands.get('sa'))
+assert.strictEqual(commands.get('upscale'), commands.get('remini'))
+assert.strictEqual(commands.get('rehd'), commands.get('remini'))
 
 // Metadata group
 const groupCmd = commands.get('group')
@@ -207,5 +211,20 @@ const textReplyToImage = {
 assert.strictEqual(getSoundSources(textReplyToImage).audio, null, 'foto tanpa audio ditolak')
 
 console.log('✅ .sa: deteksi sumber visual + audio teruji')
+
+// ── 4. Metadata stiker .sa teruji ──────────────────────────
+import { Exif, extractMetadata, Sticker } from 'wa-sticker-formatter'
+import sharp from 'sharp'
+
+const dummyWebp = await sharp({
+  create: { width: 32, height: 32, channels: 4, background: { r: 255, g: 0, b: 0, alpha: 1 } },
+}).webp().toBuffer()
+
+const testExif = new Exif({ pack: 'bot', author: 'napoleon', categories: ['🔊'] })
+const testWithExif = await testExif.add(dummyWebp)
+const extracted = await extractMetadata(testWithExif)
+assert.strictEqual(extracted['sticker-pack-name'], 'bot')
+assert.strictEqual(extracted['sticker-pack-publisher'], 'napoleon')
+console.log('✅ .sa: metadata pack dan publisher (author) teruji')
 
 console.log('\n🎉 Semua test lulus.')

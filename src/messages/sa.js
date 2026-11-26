@@ -1,5 +1,5 @@
 import { downloadMediaMessage } from '@whiskeysockets/baileys'
-import { Sticker } from 'wa-sticker-formatter'
+import { Exif, Sticker } from 'wa-sticker-formatter'
 import { getSoundSources } from '../utils/media.js'
 import {
   isFfmpegAvailable,
@@ -123,6 +123,12 @@ export default {
       return
     }
 
+    await sock.sendMessage(
+      jid,
+      { text: '⏳ Sedang memproses stiker bersuara, mohon tunggu...' },
+      { quoted: msg },
+    )
+
     await enqueueStickerJob(async () => {
       try {
         const visualIsVideo = visual.kind === 'video'
@@ -150,6 +156,13 @@ export default {
           stickerBuffer = await videoToAnimatedSticker(visualBuffer, {
             maxSeconds,
           })
+
+          const exif = new Exif({
+            pack: PACK_NAME,
+            author: AUTHOR_NAME,
+            categories: ['🔊'],
+          })
+          stickerBuffer = await exif.add(stickerBuffer)
 
           if (stickerBuffer.length > MAX_ANIMATED_STICKER_BYTES) {
             throw new UserError(
